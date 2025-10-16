@@ -16,10 +16,9 @@ type User {
 
 # User role enum
 enum UserRole {
-  ADMIN
-  MANAGER
-  HR
-  EMPLOYEE
+  hr
+  manager
+  employee
 }
 
 # User inputs

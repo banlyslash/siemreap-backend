@@ -16,51 +16,53 @@ datasource db {
 
 // User model
 model User {
-  id              String         @id @default(uuid())
-  email           String         @unique
-  password        String
-  firstName       String
-  lastName        String
-  role            UserRole       @default(EMPLOYEE)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  leaveRequests   LeaveRequest[] @relation("UserLeaveRequests")
-  managedRequests LeaveRequest[] @relation("ManagerApprovals")
-  hrApprovals     LeaveRequest[] @relation("HRApprovals")
-  leaveBalances   LeaveBalance[]
+  id               String          @id @default(uuid())
+  email            String          @unique
+  password         String
+  firstName        String          @map("first_name")
+  lastName         String          @map("last_name")
+  role             UserRole        @default(employee)
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  leaveRequests    LeaveRequest[]  @relation("UserLeaveRequests")
+  managedRequests  LeaveRequest[]  @relation("ManagerApprovals")
+  hrApprovals      LeaveRequest[]  @relation("HRApprovals")
+  leaveBalances    LeaveBalance[]
+
+  @@map("users")
 }
 
 // User roles
 enum UserRole {
-  ADMIN
-  MANAGER
-  HR
-  EMPLOYEE
+  hr
+  manager
+  employee
 }
 
 // Leave request model
 model LeaveRequest {
-  id              String            @id @default(uuid())
-  userId          String
-  user            User              @relation("UserLeaveRequests", fields: [userId], references: [id])
-  leaveTypeId     String
-  leaveType       LeaveType         @relation(fields: [leaveTypeId], references: [id])
-  startDate       DateTime
-  endDate         DateTime
-  halfDay         Boolean           @default(false)
-  reason          String?
-  status          LeaveRequestStatus @default(PENDING)
-  managerId       String?
-  manager         User?             @relation("ManagerApprovals", fields: [managerId], references: [id])
-  managerComment  String?
-  managerActionAt DateTime?
-  hrId            String?
-  hr              User?             @relation("HRApprovals", fields: [hrId], references: [id])
-  hrComment       String?
-  hrActionAt      DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id                String            @id @default(uuid())
+  userId            String            @map("user_id")
+  user              User              @relation("UserLeaveRequests", fields: [userId], references: [id])
+  leaveTypeId       String            @map("leave_type_id")
+  leaveType         LeaveType         @relation(fields: [leaveTypeId], references: [id])
+  startDate         DateTime          @map("start_date")
+  endDate           DateTime          @map("end_date")
+  halfDay           Boolean           @default(false) @map("half_day")
+  reason            String?
+  status            LeaveRequestStatus @default(pending)
+  managerId         String?           @map("manager_id")
+  manager           User?             @relation("ManagerApprovals", fields: [managerId], references: [id])
+  managerComment    String?           @map("manager_comment")
+  managerActionAt   DateTime?         @map("manager_action_at")
+  hrId              String?           @map("hr_id")
+  hr                User?             @relation("HRApprovals", fields: [hrId], references: [id])
+  hrComment         String?           @map("hr_comment")
+  hrActionAt        DateTime?         @map("hr_action_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
 
+  @@map("leave_requests")
   @@index([userId])
   @@index([managerId])
   @@index([hrId])
@@ -70,40 +72,43 @@ model LeaveRequest {
 
 // Leave request status
 enum LeaveRequestStatus {
-  PENDING
-  MANAGER_APPROVED
-  MANAGER_REJECTED
-  HR_APPROVED
-  HR_REJECTED
-  CANCELLED
+  pending
+  manager_approved
+  manager_rejected
+  hr_approved
+  hr_rejected
+  cancelled
 }
 
 // Leave type model
 model LeaveType {
-  id            String         @id @default(uuid())
-  name          String         @unique
-  description   String?
-  color         String         @default("#3498db") // Default color for calendar
-  active        Boolean        @default(true)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  leaveRequests LeaveRequest[]
-  leaveBalances LeaveBalance[]
+  id              String          @id @default(uuid())
+  name            String          @unique
+  description     String?
+  color           String          @default("#3498db") // Default color for calendar
+  active          Boolean         @default(true)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  leaveRequests   LeaveRequest[]
+  leaveBalances   LeaveBalance[]
+
+  @@map("leave_types")
 }
 
 // Leave balance model
 model LeaveBalance {
-  id          String    @id @default(uuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  leaveTypeId String
-  leaveType   LeaveType @relation(fields: [leaveTypeId], references: [id])
-  year        Int
-  allocated   Float
-  used        Float     @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  user          User      @relation(fields: [userId], references: [id])
+  leaveTypeId   String    @map("leave_type_id")
+  leaveType     LeaveType @relation(fields: [leaveTypeId], references: [id])
+  year          Int
+  allocated     Float
+  used          Float     @default(0)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
+  @@map("leave_balances")
   @@unique([userId, leaveTypeId, year])
   @@index([userId])
   @@index([leaveTypeId])
@@ -115,9 +120,10 @@ model Holiday {
   name        String
   date        DateTime
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
+  @@map("holidays")
   @@unique([date])
   @@index([date])
 }

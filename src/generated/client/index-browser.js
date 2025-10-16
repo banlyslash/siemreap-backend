@@ -195,19 +195,18 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 exports.UserRole = exports.$Enums.UserRole = {
-  ADMIN: 'ADMIN',
-  MANAGER: 'MANAGER',
-  HR: 'HR',
-  EMPLOYEE: 'EMPLOYEE'
+  hr: 'hr',
+  manager: 'manager',
+  employee: 'employee'
 };
 
 exports.LeaveRequestStatus = exports.$Enums.LeaveRequestStatus = {
-  PENDING: 'PENDING',
-  MANAGER_APPROVED: 'MANAGER_APPROVED',
-  MANAGER_REJECTED: 'MANAGER_REJECTED',
-  HR_APPROVED: 'HR_APPROVED',
-  HR_REJECTED: 'HR_REJECTED',
-  CANCELLED: 'CANCELLED'
+  pending: 'pending',
+  manager_approved: 'manager_approved',
+  manager_rejected: 'manager_rejected',
+  hr_approved: 'hr_approved',
+  hr_rejected: 'hr_rejected',
+  cancelled: 'cancelled'
 };
 
 exports.Prisma.ModelName = {

@@ -22,12 +22,12 @@ type LeaveRequest {
 
 # Leave request status enum
 enum LeaveRequestStatus {
-  PENDING
-  MANAGER_APPROVED
-  MANAGER_REJECTED
-  HR_APPROVED
-  HR_REJECTED
-  CANCELLED
+  pending
+  manager_approved
+  manager_rejected
+  hr_approved
+  hr_rejected
+  cancelled
 }
 
 # Leave request inputs

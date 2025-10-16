@@ -44,7 +44,7 @@ async function main(): Promise<void> {
       password: adminPassword,
       firstName: 'Admin',
       lastName: 'User',
-      role: UserRole.ADMIN,
+      role: UserRole.hr,
     },
   })
 
@@ -56,7 +56,7 @@ async function main(): Promise<void> {
       password: hrPassword,
       firstName: 'HR',
       lastName: 'Manager',
-      role: UserRole.HR,
+      role: UserRole.hr,
     },
   })
 
@@ -68,7 +68,7 @@ async function main(): Promise<void> {
       password: managerPassword,
       firstName: 'Team',
       lastName: 'Manager',
-      role: UserRole.MANAGER,
+      role: UserRole.manager,
     },
   })
 
@@ -80,7 +80,7 @@ async function main(): Promise<void> {
       password: employeePassword,
       firstName: 'Regular',
       lastName: 'Employee',
-      role: UserRole.EMPLOYEE,
+      role: UserRole.employee,
     },
   })
 

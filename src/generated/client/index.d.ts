@@ -44,22 +44,21 @@ export type Holiday = $Result.DefaultSelection<Prisma.$HolidayPayload>
  */
 export namespace $Enums {
   export const UserRole: {
-  ADMIN: 'ADMIN',
-  MANAGER: 'MANAGER',
-  HR: 'HR',
-  EMPLOYEE: 'EMPLOYEE'
+  hr: 'hr',
+  manager: 'manager',
+  employee: 'employee'
 };
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
 export const LeaveRequestStatus: {
-  PENDING: 'PENDING',
-  MANAGER_APPROVED: 'MANAGER_APPROVED',
-  MANAGER_REJECTED: 'MANAGER_REJECTED',
-  HR_APPROVED: 'HR_APPROVED',
-  HR_REJECTED: 'HR_REJECTED',
-  CANCELLED: 'CANCELLED'
+  pending: 'pending',
+  manager_approved: 'manager_approved',
+  manager_rejected: 'manager_rejected',
+  hr_approved: 'hr_approved',
+  hr_rejected: 'hr_rejected',
+  cancelled: 'cancelled'
 };
 
 export type LeaveRequestStatus = (typeof LeaveRequestStatus)[keyof typeof LeaveRequestStatus]
