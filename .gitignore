@@ -33,5 +33,5 @@ coverage/
 .env.test.local
 .env.production.local
 
-generated/prisma
-generated/client
+src/generated/
+ 
