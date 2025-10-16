@@ -1,0 +1,40 @@
+# User related types and inputs
+
+# User type
+type User {
+  id: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  role: UserRole!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  leaveRequests: [LeaveRequest!]!
+  managedRequests: [LeaveRequest!]!
+  leaveBalances: [LeaveBalance!]!
+}
+
+# User role enum
+enum UserRole {
+  ADMIN
+  MANAGER
+  HR
+  EMPLOYEE
+}
+
+# User inputs
+input CreateUserInput {
+  email: String!
+  password: String!
+  firstName: String!
+  lastName: String!
+  role: UserRole!
+}
+
+input UpdateUserInput {
+  email: String
+  password: String
+  firstName: String
+  lastName: String
+  role: UserRole
+}

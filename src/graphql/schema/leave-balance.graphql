@@ -1,0 +1,20 @@
+# Leave balance related types and inputs
+
+# Leave balance type
+type LeaveBalance {
+  id: ID!
+  user: User!
+  leaveType: LeaveType!
+  year: Int!
+  allocated: Float!
+  used: Float!
+  remaining: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Leave balance inputs
+input UpdateLeaveBalanceInput {
+  allocated: Float
+  used: Float
+}

@@ -1,0 +1,24 @@
+# Holiday related types and inputs
+
+# Holiday type
+type Holiday {
+  id: ID!
+  name: String!
+  date: DateTime!
+  description: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Holiday inputs
+input CreateHolidayInput {
+  name: String!
+  date: DateTime!
+  description: String
+}
+
+input UpdateHolidayInput {
+  name: String
+  date: DateTime
+  description: String
+}

@@ -1,0 +1,56 @@
+# Leave request related types and inputs
+
+# Leave request type
+type LeaveRequest {
+  id: ID!
+  user: User!
+  leaveType: LeaveType!
+  startDate: DateTime!
+  endDate: DateTime!
+  halfDay: Boolean!
+  reason: String
+  status: LeaveRequestStatus!
+  manager: User
+  managerComment: String
+  managerActionAt: DateTime
+  hr: User
+  hrComment: String
+  hrActionAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Leave request status enum
+enum LeaveRequestStatus {
+  PENDING
+  MANAGER_APPROVED
+  MANAGER_REJECTED
+  HR_APPROVED
+  HR_REJECTED
+  CANCELLED
+}
+
+# Leave request inputs
+input CreateLeaveRequestInput {
+  userId: ID!
+  leaveTypeId: ID!
+  startDate: DateTime!
+  endDate: DateTime!
+  halfDay: Boolean
+  reason: String
+}
+
+input UpdateLeaveRequestInput {
+  leaveTypeId: ID
+  startDate: DateTime
+  endDate: DateTime
+  halfDay: Boolean
+  reason: String
+  status: LeaveRequestStatus
+  managerId: ID
+  managerComment: String
+  managerActionAt: DateTime
+  hrId: ID
+  hrComment: String
+  hrActionAt: DateTime
+}

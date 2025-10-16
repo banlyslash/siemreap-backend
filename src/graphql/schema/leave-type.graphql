@@ -1,0 +1,29 @@
+# Leave type related types and inputs
+
+# Leave type
+type LeaveType {
+  id: ID!
+  name: String!
+  description: String
+  color: String!
+  active: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  leaveRequests: [LeaveRequest!]!
+  leaveBalances: [LeaveBalance!]!
+}
+
+# Leave type inputs
+input CreateLeaveTypeInput {
+  name: String!
+  description: String
+  color: String
+  active: Boolean
+}
+
+input UpdateLeaveTypeInput {
+  name: String
+  description: String
+  color: String
+  active: Boolean
+}

@@ -1,0 +1,64 @@
+# Root schema file
+scalar DateTime
+
+type Query {
+  # User queries
+  me: User
+  users: [User!]!
+  user(id: ID!): User
+
+  # Leave type queries
+  leaveTypes: [LeaveType!]!
+  leaveType(id: ID!): LeaveType
+
+  # Leave request queries
+  leaveRequests(
+    status: LeaveRequestStatus
+    userId: ID
+    startDate: DateTime
+    endDate: DateTime
+  ): [LeaveRequest!]!
+  leaveRequest(id: ID!): LeaveRequest
+
+  # Leave balance queries
+  leaveBalances(userId: ID, year: Int): [LeaveBalance!]!
+  leaveBalance(id: ID!): LeaveBalance
+
+  # Holiday queries
+  holidays(year: Int): [Holiday!]!
+  holiday(id: ID!): Holiday
+}
+
+type Mutation {
+  # Auth mutations
+  login(email: String!, password: String!): AuthPayload!
+  
+  # User mutations
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  
+  # Leave request mutations
+  createLeaveRequest(input: CreateLeaveRequestInput!): LeaveRequest!
+  updateLeaveRequest(id: ID!, input: UpdateLeaveRequestInput!): LeaveRequest!
+  approveLeaveRequest(id: ID!, comment: String): LeaveRequest!
+  rejectLeaveRequest(id: ID!, comment: String!): LeaveRequest!
+  cancelLeaveRequest(id: ID!): LeaveRequest!
+  
+  # Leave type mutations
+  createLeaveType(input: CreateLeaveTypeInput!): LeaveType!
+  updateLeaveType(id: ID!, input: UpdateLeaveTypeInput!): LeaveType!
+  
+  # Leave balance mutations
+  updateLeaveBalance(id: ID!, input: UpdateLeaveBalanceInput!): LeaveBalance!
+  
+  # Holiday mutations
+  createHoliday(input: CreateHolidayInput!): Holiday!
+  updateHoliday(id: ID!, input: UpdateHolidayInput!): Holiday!
+  deleteHoliday(id: ID!): Boolean!
+}
+
+# Auth types
+type AuthPayload {
+  token: String!
+  user: User!
+}

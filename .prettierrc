@@ -1,0 +1,24 @@
+{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 80,
+  "tabWidth": 2,
+  "arrowParens": "avoid",
+  "endOfLine": "lf",
+  "bracketSpacing": true,
+  "overrides": [
+    {
+      "files": "*.graphql",
+      "options": {
+        "parser": "graphql"
+      }
+    },
+    {
+      "files": "*.prisma",
+      "options": {
+        "parser": "prisma-prisma-io"
+      }
+    }
+  ]
+}

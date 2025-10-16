@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id              String         @id @default(uuid())
+  email           String         @unique
+  password        String
+  firstName       String
+  lastName        String
+  role            UserRole       @default(EMPLOYEE)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  leaveRequests   LeaveRequest[] @relation("UserLeaveRequests")
+  managedRequests LeaveRequest[] @relation("ManagerApprovals")
+  hrApprovals     LeaveRequest[] @relation("HRApprovals")
+  leaveBalances   LeaveBalance[]
+}
+
+// User roles
+enum UserRole {
+  ADMIN
+  MANAGER
+  HR
+  EMPLOYEE
+}
+
+// Leave request model
+model LeaveRequest {
+  id              String             @id @default(uuid())
+  userId          String
+  user            User               @relation("UserLeaveRequests", fields: [userId], references: [id])
+  leaveTypeId     String
+  leaveType       LeaveType          @relation(fields: [leaveTypeId], references: [id])
+  startDate       DateTime
+  endDate         DateTime
+  halfDay         Boolean            @default(false)
+  reason          String?
+  status          LeaveRequestStatus @default(PENDING)
+  managerId       String?
+  manager         User?              @relation("ManagerApprovals", fields: [managerId], references: [id])
+  managerComment  String?
+  managerActionAt DateTime?
+  hrId            String?
+  hr              User?              @relation("HRApprovals", fields: [hrId], references: [id])
+  hrComment       String?
+  hrActionAt      DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([managerId])
+  @@index([hrId])
+  @@index([leaveTypeId])
+  @@index([status])
+}
+
+// Leave request status
+enum LeaveRequestStatus {
+  PENDING
+  MANAGER_APPROVED
+  MANAGER_REJECTED
+  HR_APPROVED
+  HR_REJECTED
+  CANCELLED
+}
+
+// Leave type model
+model LeaveType {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  description   String?
+  color         String         @default("#3498db") // Default color for calendar
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  leaveRequests LeaveRequest[]
+  leaveBalances LeaveBalance[]
+}
+
+// Leave balance model
+model LeaveBalance {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  leaveTypeId String
+  leaveType   LeaveType @relation(fields: [leaveTypeId], references: [id])
+  year        Int
+  allocated   Float
+  used        Float     @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, leaveTypeId, year])
+  @@index([userId])
+  @@index([leaveTypeId])
+}
+
+// Holiday calendar
+model Holiday {
+  id          String   @id @default(uuid())
+  name        String
+  date        DateTime
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([date])
+  @@index([date])
+}
