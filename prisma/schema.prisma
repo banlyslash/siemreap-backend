@@ -28,6 +28,7 @@ model User {
   managedRequests  LeaveRequest[]  @relation("ManagerApprovals")
   hrApprovals      LeaveRequest[]  @relation("HRApprovals")
   leaveBalances    LeaveBalance[]
+  leaveAudits      LeaveAudit[]    @relation("UserLeaveAudits")
 
   @@map("users")
 }
@@ -49,6 +50,8 @@ model LeaveRequest {
   startDate         DateTime          @map("start_date")
   endDate           DateTime          @map("end_date")
   halfDay           Boolean           @default(false) @map("half_day")
+  halfDayStart      Boolean           @default(false) @map("half_day_start")
+  halfDayEnd        Boolean           @default(false) @map("half_day_end")
   reason            String?
   status            LeaveRequestStatus @default(pending)
   managerId         String?           @map("manager_id")
@@ -61,6 +64,7 @@ model LeaveRequest {
   hrActionAt        DateTime?         @map("hr_action_at")
   createdAt         DateTime          @default(now()) @map("created_at")
   updatedAt         DateTime          @updatedAt @map("updated_at")
+  auditTrail        LeaveAudit[]      @relation("LeaveRequestAudits")
 
   @@map("leave_requests")
   @@index([userId])
@@ -105,6 +109,7 @@ model LeaveBalance {
   year          Int
   allocated     Float
   used          Float     @default(0)
+  pending       Float     @default(0) @map("pending")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
@@ -126,4 +131,24 @@ model Holiday {
   @@map("holidays")
   @@unique([date])
   @@index([date])
+}
+
+// Leave audit trail
+model LeaveAudit {
+  id               String            @id @default(uuid())
+  leaveRequestId   String            @map("leave_request_id")
+  leaveRequest     LeaveRequest      @relation("LeaveRequestAudits", fields: [leaveRequestId], references: [id])
+  action           String
+  performedById    String            @map("performed_by_id")
+  performedBy      User              @relation("UserLeaveAudits", fields: [performedById], references: [id])
+  timestamp        DateTime          @default(now())
+  details          String?
+  previousStatus   LeaveRequestStatus?
+  newStatus        LeaveRequestStatus?
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  @@map("leave_audits")
+  @@index([leaveRequestId])
+  @@index([performedById])
+  @@index([timestamp])
 }

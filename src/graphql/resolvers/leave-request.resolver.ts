@@ -2,6 +2,8 @@ import { GraphQLContext } from '../context'
 import { GraphQLError } from 'graphql'
 import { requireAuth } from '@/utils/auth'
 import { LeaveRequestStatus } from '@/generated/client'
+import { NotificationService } from '@/services/notification.service'
+import { createLeaveAudit } from './leave-history.resolver'
 
 export const leaveRequestResolvers = {
   Query: {
@@ -109,6 +111,89 @@ export const leaveRequestResolvers = {
       }
 
       return leaveRequest
+    },
+
+    // For managers to see pending requests they need to approve
+    pendingApprovals: async (_: any, _args: {}, context: GraphQLContext) => {
+      const { prisma, user } = context
+      requireAuth(user)
+      
+      // Only managers can access this query
+      if (user?.role !== 'manager') {
+        throw new GraphQLError('Not authorized to view pending approvals', {
+          extensions: { code: 'FORBIDDEN' }
+        })
+      }
+      
+      // Find all pending leave requests that need manager approval
+      return prisma.leaveRequest.findMany({
+        where: {
+          status: LeaveRequestStatus.pending,
+          // In a real application, you would have a relation between managers and employees
+          // For now, we'll just fetch all pending requests
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: true,
+          leaveType: true,
+          manager: true,
+          hr: true
+        }
+      })
+    },
+
+    // For HR to see requests approved by managers
+    managerApprovedRequests: async (_: any, _args: {}, context: GraphQLContext) => {
+      const { prisma, user } = context
+      requireAuth(user)
+      
+      // Only HR can access this query
+      if (user?.role !== 'hr') {
+        throw new GraphQLError('Not authorized to view manager approved requests', {
+          extensions: { code: 'FORBIDDEN' }
+        })
+      }
+      
+      // Find all leave requests approved by managers that need HR approval
+      return prisma.leaveRequest.findMany({
+        where: {
+          status: LeaveRequestStatus.manager_approved
+        },
+        orderBy: { managerActionAt: 'desc' },
+        include: {
+          user: true,
+          leaveType: true,
+          manager: true,
+          hr: true
+        }
+      })
+    },
+
+    // For HR to see all pending leave requests that need follow-up
+    hrPendingApprovals: async (_: any, _args: {}, context: GraphQLContext) => {
+      const { prisma, user } = context
+      requireAuth(user)
+      
+      // Only HR can access this query
+      if (user?.role !== 'hr') {
+        throw new GraphQLError('Not authorized to view pending approvals', {
+          extensions: { code: 'FORBIDDEN' }
+        })
+      }
+      
+      // Find all pending leave requests for HR to follow up
+      return prisma.leaveRequest.findMany({
+        where: {
+          status: LeaveRequestStatus.pending
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: true,
+          leaveType: true,
+          manager: true,
+          hr: true
+        }
+      })
     }
   },
 
@@ -118,10 +203,13 @@ export const leaveRequestResolvers = {
       _: any,
       args: { input: { 
         userId: string
+        employeeId?: string // For backward compatibility
         leaveTypeId: string
         startDate: Date
         endDate: Date
         halfDay?: boolean
+        halfDayStart?: boolean
+        halfDayEnd?: boolean
         reason?: string
       } },
       context: GraphQLContext
@@ -213,14 +301,27 @@ export const leaveRequestResolvers = {
         })
       }
 
+      // Handle employeeId for backward compatibility
+      const userId = input.userId || input.employeeId
+      
+      if (!userId) {
+        throw new GraphQLError('Either userId or employeeId must be provided', {
+          extensions: { code: 'BAD_USER_INPUT' }
+        })
+      }
+      
+      // Handle half day logic
+      // If halfDayStart or halfDayEnd is provided, set halfDay to true
+      const halfDay = input.halfDay || input.halfDayStart || input.halfDayEnd || false
+      
       // Create the leave request
       const leaveRequest = await prisma.leaveRequest.create({
         data: {
-          userId: input.userId,
+          userId,
           leaveTypeId: input.leaveTypeId,
           startDate,
           endDate,
-          halfDay: input.halfDay || false,
+          halfDay,
           reason: input.reason,
           status: LeaveRequestStatus.pending
         },
@@ -229,6 +330,25 @@ export const leaveRequestResolvers = {
           leaveType: true
         }
       })
+
+      // Send notification
+      await NotificationService.sendLeaveRequestSubmittedNotification(
+        leaveRequest,
+        leaveRequest.user
+      )
+
+      // Create audit entry
+      if (user) {
+        await createLeaveAudit(
+          prisma,
+          leaveRequest.id,
+          'created' as any, // Type assertion as a temporary fix
+          user.id,
+          'Leave request created',
+          undefined,
+          LeaveRequestStatus.pending
+        )
+      }
 
       return leaveRequest
     },
@@ -430,6 +550,43 @@ export const leaveRequestResolvers = {
         }
       })
 
+      // Send appropriate notifications
+      if (user.role === 'manager') {
+        await NotificationService.sendManagerApprovalNotification(
+          updatedLeaveRequest,
+          updatedLeaveRequest.user,
+          user
+        )
+        
+        // Create audit entry for manager approval
+        await createLeaveAudit(
+          prisma,
+          id,
+          'approved_by_manager' as any,
+          user.id,
+          comment || 'Approved by manager',
+          LeaveRequestStatus.pending,
+          LeaveRequestStatus.manager_approved
+        )
+      } else if (user.role === 'hr') {
+        await NotificationService.sendHRApprovalNotification(
+          updatedLeaveRequest,
+          updatedLeaveRequest.user,
+          user
+        )
+        
+        // Create audit entry for HR approval
+        await createLeaveAudit(
+          prisma,
+          id,
+          'approved_by_hr' as any,
+          user.id,
+          comment || 'Approved by HR',
+          LeaveRequestStatus.manager_approved,
+          LeaveRequestStatus.hr_approved
+        )
+      }
+
       return updatedLeaveRequest
     },
 
@@ -514,6 +671,43 @@ export const leaveRequestResolvers = {
         }
       })
 
+      // Send appropriate notifications
+      if (user.role === 'manager') {
+        await NotificationService.sendManagerRejectionNotification(
+          updatedLeaveRequest,
+          updatedLeaveRequest.user,
+          user
+        )
+        
+        // Create audit entry for manager rejection
+        await createLeaveAudit(
+          prisma,
+          id,
+          'rejected_by_manager' as any,
+          user.id,
+          comment,
+          LeaveRequestStatus.pending,
+          LeaveRequestStatus.manager_rejected
+        )
+      } else if (user.role === 'hr') {
+        await NotificationService.sendHRRejectionNotification(
+          updatedLeaveRequest,
+          updatedLeaveRequest.user,
+          user
+        )
+        
+        // Create audit entry for HR rejection
+        await createLeaveAudit(
+          prisma,
+          id,
+          'rejected_by_hr' as any,
+          user.id,
+          comment,
+          LeaveRequestStatus.manager_approved,
+          LeaveRequestStatus.hr_rejected
+        )
+      }
+
       return updatedLeaveRequest
     },
 
@@ -572,6 +766,25 @@ export const leaveRequestResolvers = {
           hr: true
         }
       })
+
+      // Send cancellation notification
+      await NotificationService.sendCancellationNotification(
+        updatedLeaveRequest,
+        updatedLeaveRequest.user
+      )
+      
+      // Create audit entry for cancellation
+      if (user) {
+        await createLeaveAudit(
+          prisma,
+          id,
+          'cancelled' as any,
+          user.id,
+          'Leave request cancelled',
+          leaveRequest.status,
+          LeaveRequestStatus.cancelled
+        )
+      }
 
       return updatedLeaveRequest
     }

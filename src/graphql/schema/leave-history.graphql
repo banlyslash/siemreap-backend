@@ -1,0 +1,63 @@
+# Leave history related types and enums
+
+# Leave history result type for pagination
+type LeaveHistoryResult {
+  items: [LeaveRequest!]!
+  total: Int!
+  page: Int!
+  pageSize: Int!
+  hasMore: Boolean!
+}
+
+# Leave audit entry type
+type LeaveAuditEntry {
+  id: ID!
+  leaveRequestId: ID!
+  action: LeaveAuditAction!
+  performedBy: User!
+  timestamp: DateTime!
+  details: String
+  previousStatus: LeaveRequestStatus
+  newStatus: LeaveRequestStatus
+}
+
+# Leave audit action enum
+enum LeaveAuditAction {
+  created
+  updated
+  status_changed
+  approved_by_manager
+  rejected_by_manager
+  approved_by_hr
+  rejected_by_hr
+  cancelled
+}
+
+# Leave history sort field enum
+enum LeaveHistorySortField {
+  startDate
+  endDate
+  createdAt
+  updatedAt
+  status
+  leaveType
+}
+
+# Sort direction enum
+enum SortDirection {
+  asc
+  desc
+}
+
+# Export format enum
+enum ExportFormat {
+  csv
+  pdf
+}
+
+# Export result type
+type ExportResult {
+  url: String!
+  filename: String!
+  expiresAt: DateTime!
+}

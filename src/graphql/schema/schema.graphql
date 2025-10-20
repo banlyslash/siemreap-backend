@@ -19,10 +19,41 @@ type Query {
     endDate: DateTime
   ): [LeaveRequest!]!
   leaveRequest(id: ID!): LeaveRequest
+  
+  # Leave history queries
+  leaveHistory(
+    userId: ID
+    leaveTypeId: ID
+    status: LeaveRequestStatus
+    startDate: DateTime
+    endDate: DateTime
+    sortBy: LeaveHistorySortField
+    sortDirection: SortDirection
+    page: Int
+    pageSize: Int
+  ): LeaveHistoryResult!
+  
+  # Export leave history
+  exportLeaveHistory(
+    userId: ID
+    leaveTypeId: ID
+    status: LeaveRequestStatus
+    startDate: DateTime
+    endDate: DateTime
+    format: ExportFormat!
+  ): ExportResult!
+  
+  # Leave audit trail
+  leaveAuditTrail(leaveRequestId: ID!): [LeaveAuditEntry!]!
+  
+  # Leave approval dashboard queries
+  pendingApprovals: [LeaveRequest!]! # For managers to see pending requests they need to approve
+  managerApprovedRequests: [LeaveRequest!]! # For HR to see requests approved by managers
 
   # Leave balance queries
   leaveBalances(userId: ID, year: Int): [LeaveBalance!]!
   leaveBalance(id: ID!): LeaveBalance
+  userLeaveBalances(userId: ID!, year: Int): UserLeaveBalances!
 
   # Holiday queries
   holidays(year: Int): [Holiday!]!
@@ -43,6 +74,12 @@ type Mutation {
   approveLeaveRequest(id: ID!, comment: String): LeaveRequest!
   rejectLeaveRequest(id: ID!, comment: String!): LeaveRequest!
   cancelLeaveRequest(id: ID!): LeaveRequest!
+  
+  # Role-specific approval mutations (for frontend compatibility)
+  managerApproveLeaveRequest(id: ID!, comment: String): LeaveRequest!
+  managerRejectLeaveRequest(id: ID!, comment: String!): LeaveRequest!
+  hrApproveLeaveRequest(id: ID!, comment: String): LeaveRequest!
+  hrRejectLeaveRequest(id: ID!, comment: String!): LeaveRequest!
   
   # Leave type mutations
   createLeaveType(input: CreateLeaveTypeInput!): LeaveType!

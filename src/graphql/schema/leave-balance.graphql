@@ -7,10 +7,19 @@ type LeaveBalance {
   leaveType: LeaveType!
   year: Int!
   allocated: Float!
+  entitled: Float! @deprecated(reason: "Use 'allocated' instead")
   used: Float!
+  pending: Float!
   remaining: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+# Aggregated leave balances for a user
+type UserLeaveBalances {
+  userId: ID!
+  year: Int!
+  balances: [LeaveBalance!]!
 }
 
 # Leave balance inputs

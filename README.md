@@ -27,6 +27,7 @@ The Leave Request Management System (LRMS) is a modern backend application desig
 - **Leave Types**: Support for various leave categories (Annual, Sick, Personal)
 - **Leave Balances**: Automatic tracking of allocated and used leave days
 - **Holiday Calendar**: Management of company holidays
+- **HR Dashboard**: View pending approvals for follow-up and manager-approved requests
 
 ## Tech Stack
 

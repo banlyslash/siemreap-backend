@@ -1,0 +1,4 @@
+extend type Query {
+  # For HR to see all pending leave requests that need follow-up
+  hrPendingApprovals: [LeaveRequest!]!
+}
