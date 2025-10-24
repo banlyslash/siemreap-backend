@@ -27,3 +27,17 @@ input UpdateLeaveBalanceInput {
   allocated: Float
   used: Float
 }
+
+# Input for initializing leave balances for an employee
+input InitializeLeaveBalanceInput {
+  userId: ID!
+  year: Int
+  defaultAllocation: Float!
+}
+
+# Response for initialize leave balances mutation
+type InitializeLeaveBalanceResult {
+  success: Boolean!
+  message: String
+  balances: [LeaveBalance!]
+}

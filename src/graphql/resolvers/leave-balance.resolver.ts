@@ -120,6 +120,116 @@ export const leaveBalanceResolvers = {
       })
       
       return updatedLeaveBalance
+    },
+
+    /**
+     * Initialize leave balances for an employee
+     * This will create leave balances for all active leave types for the specified employee
+     */
+    initializeLeaveBalance: async (
+      _: any,
+      { input }: { input: { userId: string; year?: number; defaultAllocation: number } },
+      { prisma, user }: GraphQLContext
+    ) => {
+      requireAuth(user)
+      
+      // Only HR can initialize leave balances
+      if (user?.role !== 'hr') {
+        throw new GraphQLError('Not authorized to initialize leave balances', {
+          extensions: { code: 'FORBIDDEN' }
+        })
+      }
+      
+      const { userId, year = new Date().getFullYear(), defaultAllocation } = input
+      
+      // Check if user exists
+      const employeeExists = await prisma.user.findUnique({
+        where: { id: userId }
+      })
+      
+      if (!employeeExists) {
+        throw new GraphQLError('Employee not found', {
+          extensions: { code: 'NOT_FOUND' }
+        })
+      }
+      
+      // Get all active leave types
+      const activeLeaveTypes = await prisma.leaveType.findMany({
+        where: { active: true }
+      })
+      
+      if (activeLeaveTypes.length === 0) {
+        return {
+          success: false,
+          message: 'No active leave types found',
+          balances: []
+        }
+      }
+      
+      // Check for existing leave balances for this user and year
+      const existingBalances = await prisma.leaveBalance.findMany({
+        where: {
+          userId,
+          year
+        }
+      })
+      
+      // Create a map of existing balances by leave type ID
+      const existingBalanceMap = new Map()
+      existingBalances.forEach(balance => {
+        existingBalanceMap.set(balance.leaveTypeId, balance)
+      })
+      
+      // Create or update leave balances for each leave type
+      const balancePromises = activeLeaveTypes.map(async leaveType => {
+        const existingBalance = existingBalanceMap.get(leaveType.id)
+        
+        if (existingBalance) {
+          // Balance already exists, update it
+          return prisma.leaveBalance.update({
+            where: { id: existingBalance.id },
+            data: {
+              allocated: defaultAllocation
+            },
+            include: {
+              user: true,
+              leaveType: true
+            }
+          })
+        } else {
+          // Create new balance
+          return prisma.leaveBalance.create({
+            data: {
+              userId,
+              leaveTypeId: leaveType.id,
+              year,
+              allocated: defaultAllocation,
+              used: 0,
+              pending: 0
+            },
+            include: {
+              user: true,
+              leaveType: true
+            }
+          })
+        }
+      })
+      
+      try {
+        const createdBalances = await Promise.all(balancePromises)
+        
+        return {
+          success: true,
+          message: `Successfully initialized ${createdBalances.length} leave balances for employee`,
+          balances: createdBalances
+        }
+      } catch (error) {
+        return {
+          success: false,
+          message: `Failed to initialize leave balances: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          balances: []
+        }
+      }
     }
   },
 
