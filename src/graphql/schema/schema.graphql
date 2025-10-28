@@ -55,6 +55,10 @@ type Query {
   leaveBalance(id: ID!): LeaveBalance
   userLeaveBalances(userId: ID!, year: Int): UserLeaveBalances!
 
+  # Team queries
+  teamMembers(managerId: ID!): [User!]!
+  teamOnLeaveToday(managerId: ID!): [LeaveRequest!]!
+
   # Holiday queries
   holidays(year: Int): [Holiday!]!
   holiday(id: ID!): Holiday

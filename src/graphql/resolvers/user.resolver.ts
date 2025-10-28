@@ -34,6 +34,89 @@ export const userResolvers = {
       }
 
       return foundUser
+    },
+
+    /**
+     * Get team members for a manager
+     */
+    teamMembers: async (_: any, { managerId }: { managerId: string }, { prisma, user }: GraphQLContext) => {
+      requireAuth(user)
+      
+      // Only managers and HR can access this query
+      if (user?.role !== 'manager' && user?.role !== 'hr') {
+        throw new GraphQLError('Not authorized to view team members', {
+          extensions: { code: 'FORBIDDEN' }
+        })
+      }
+      
+      // Check if the manager exists
+      const manager = await prisma.user.findUnique({
+        where: { id: managerId }
+      })
+      
+      if (!manager) {
+        throw new GraphQLError('Manager not found', {
+          extensions: { code: 'NOT_FOUND' }
+        })
+      }
+      
+      // In a real application, you would have a relation between managers and employees
+      // For now, we'll just return all employees as team members
+      return prisma.user.findMany({
+        where: {
+          role: 'employee'
+        },
+        orderBy: { firstName: 'asc' }
+      })
+    },
+
+    /**
+     * Get team members on leave today
+     */
+    teamOnLeaveToday: async (_: any, { managerId }: { managerId: string }, { prisma, user }: GraphQLContext) => {
+      requireAuth(user)
+      
+      // Only managers and HR can access this query
+      if (user?.role !== 'manager' && user?.role !== 'hr') {
+        throw new GraphQLError('Not authorized to view team leave status', {
+          extensions: { code: 'FORBIDDEN' }
+        })
+      }
+      
+      // Check if the manager exists
+      const manager = await prisma.user.findUnique({
+        where: { id: managerId }
+      })
+      
+      if (!manager) {
+        throw new GraphQLError('Manager not found', {
+          extensions: { code: 'NOT_FOUND' }
+        })
+      }
+      
+      // Get current date at midnight for date comparisons
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      
+      const tomorrow = new Date(today)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      
+      // Find all approved leave requests that include today
+      return prisma.leaveRequest.findMany({
+        where: {
+          status: 'hr_approved',
+          startDate: { lte: tomorrow },
+          endDate: { gte: today },
+          user: {
+            role: 'employee'
+          }
+        },
+        include: {
+          user: true,
+          leaveType: true
+        },
+        orderBy: { startDate: 'asc' }
+      })
     }
   },
 
