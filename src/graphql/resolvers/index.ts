@@ -7,6 +7,7 @@ import { leaveTypeResolvers } from './leave-type.resolver'
 import { leaveBalanceResolvers } from './leave-balance.resolver'
 import { holidayResolvers } from './holiday.resolver'
 import { statisticsResolvers } from './statistics.resolver'
+import { leaveBatchResolvers } from './leave-batch.resolver'
 
 // Merge all resolvers
 const resolvers = {
@@ -47,6 +48,7 @@ const resolvers = {
     ...leaveTypeResolvers.Mutation,
     ...leaveBalanceResolvers.Mutation,
     ...holidayResolvers.Mutation,
+    ...leaveBatchResolvers.Mutation,
   },
 }
 

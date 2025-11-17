@@ -152,3 +152,21 @@ model LeaveAudit {
   @@index([performedById])
   @@index([timestamp])
 }
+
+// API Key model for service-to-service authentication
+model ApiKey {
+  id          String    @id @default(uuid())
+  key         String    @unique
+  name        String    // Descriptive name for the API key
+  description String?
+  serviceName String    @map("service_name") // Name of the service using this key
+  permissions String[]  // Array of permissions granted to this key
+  active      Boolean   @default(true)
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  lastUsedAt  DateTime? @map("last_used_at")
+
+  @@map("api_keys")
+  @@index([key])
+}

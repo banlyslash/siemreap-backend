@@ -16,7 +16,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node -r tsconfig-paths/register prisma/seed.ts",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "codegen": "graphql-codegen --config codegen.ts",
+    "compile-schema": "ts-node -r tsconfig-paths/register scripts/compile-schema.ts"
   },
   "keywords": [],
   "author": "",

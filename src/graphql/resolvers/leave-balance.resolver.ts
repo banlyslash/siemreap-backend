@@ -1,6 +1,7 @@
 import { GraphQLContext } from '../context'
 import { GraphQLError } from 'graphql'
 import { requireAuth } from '@/utils/auth'
+import { requireServiceAuth } from '@/utils/service-auth'
 
 export const leaveBalanceResolvers = {
   Query: {
@@ -77,6 +78,52 @@ export const leaveBalanceResolvers = {
       }
 
       return leaveBalance
+    },
+
+    /**
+     * Get leave balances for a user by email (API key authentication)
+     * Requires API key with 'read:leaves' permission
+     */
+    leaveBalancesByEmail: async (
+      _: any,
+      args: { email: string; year?: number },
+      context: GraphQLContext
+    ) => {
+      const { prisma } = context
+      
+      // Require API key authentication with read:leaves permission
+      requireServiceAuth(context, ['read:leaves'])
+      
+      const { email, year = new Date().getFullYear() } = args
+      
+      // Find the user by email
+      const user = await prisma.user.findUnique({
+        where: { email }
+      })
+      
+      if (!user) {
+        throw new GraphQLError(`User with email ${email} not found`, {
+          extensions: { code: 'NOT_FOUND' }
+        })
+      }
+      
+      // Get all leave balances for the user and year
+      const balances = await prisma.leaveBalance.findMany({
+        where: {
+          userId: user.id,
+          year
+        },
+        include: {
+          user: true,
+          leaveType: true
+        }
+      })
+      
+      return {
+        userId: user.id,
+        year,
+        balances
+      }
     }
   },
 

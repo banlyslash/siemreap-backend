@@ -1,0 +1,23 @@
+# Leave batch creation types and inputs
+
+# Single leave entry for batch creation
+input LeaveEntry {
+  leaveOn: DateTime!
+  isHalfDay: Boolean!
+}
+
+# Input for batch leave creation
+input CreateLeaveBatchInput {
+  leaves: [LeaveEntry!]!
+  leaveTypeName: String
+  userEmail: String  # Required for service-to-service requests
+}
+
+# Result of batch leave creation
+type CreateLeaveBatchResult {
+  success: Boolean!
+  message: String!
+  leaveRequests: [LeaveRequest!]!
+  numberOfDays: Float!
+  remainingBalance: Float!
+}
