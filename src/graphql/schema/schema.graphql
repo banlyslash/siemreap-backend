@@ -54,6 +54,7 @@ type Query {
   leaveBalances(userId: ID, year: Int): [LeaveBalance!]!
   leaveBalance(id: ID!): LeaveBalance
   userLeaveBalances(userId: ID!, year: Int): UserLeaveBalances!
+  leaveBalancesByEmail(email: String!, year: Int): UserLeaveBalances!
 
   # Team queries
   teamMembers(managerId: ID!): [User!]!
@@ -74,6 +75,7 @@ type Mutation {
   
   # Leave request mutations
   createLeaveRequest(input: CreateLeaveRequestInput!): LeaveRequest!
+  createLeaveBatch(input: CreateLeaveBatchInput!): CreateLeaveBatchResult!
   updateLeaveRequest(id: ID!, input: UpdateLeaveRequestInput!): LeaveRequest!
   approveLeaveRequest(id: ID!, comment: String): LeaveRequest!
   rejectLeaveRequest(id: ID!, comment: String!): LeaveRequest!
