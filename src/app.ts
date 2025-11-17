@@ -8,13 +8,11 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import http from 'http'
 import fs from 'fs'
 import path from 'path'
-import { PrismaClient } from '@/generated/client'
-import { verifyToken } from '@/utils/auth'
-
 import config from '@/config/env'
 import routes from '@/routes/index'
 import { errorHandler } from '@/middlewares/error.middleware'
 import resolvers from '@graphql/resolvers'
+import { createContext } from '@/graphql/context'
 
 // Create Express app
 const app = express()
@@ -52,25 +50,10 @@ async function startApolloServer() {
     `${config.apiPrefix}/graphql`,
     cors<cors.CorsRequest>(),
     express.json(),
-    // Use a type assertion to avoid TypeScript errors
-    // This is necessary due to version mismatches between Apollo Server's Express types and our project's Express types
-    (req, res, next) => {
-      // Create a middleware wrapper that calls expressMiddleware
-      expressMiddleware(server, {
-        context: async ({ req, res }) => {
-          // Get the user token from the headers
-          const token = req.headers.authorization?.replace('Bearer ', '') || ''
-          
-          // Create a new PrismaClient instance
-          const prisma = new PrismaClient()
-          
-          // Try to retrieve a user with the token
-          const user = token ? await verifyToken(token, prisma) : null
-          
-          return { prisma, req, res, user }
-        },
-      })(req, res, next)
-    }
+    // @ts-ignore - Type mismatch between Apollo Server's Express types and project's Express types
+    expressMiddleware(server, {
+      context: createContext,
+    })
   )
 }
 

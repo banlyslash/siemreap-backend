@@ -147,9 +147,16 @@ The Leave Request Management System (LRMS) is a modern backend application desig
    npm run codegen
    ```
 
-2. Access GraphQL Playground:
+2. Compile GraphQL schema for frontend sharing:
+   ```bash
+   npm run compile-schema
+   ```
+   See [SCHEMA_QUICK_START.md](docs/SCHEMA_QUICK_START.md) for details.
+
+3. Access GraphQL Playground:
    - Start the development server
-   - Navigate to http://localhost:3001/api/graphql
+   - Navigate to http://localhost:4000 (simple-graphql-server)
+   - Or http://localhost:3001/api/graphql (full app server)
 
 ## Build & Deployment
 
@@ -193,6 +200,22 @@ After seeding the database, you can log in with these users:
 - **HR**: hr@example.com / hr123
 - **Manager**: manager@example.com / manager123
 - **Employee**: employee@example.com / employee123
+
+## Additional Documentation
+
+- **[API Key Usage](docs/API_KEY_USAGE.md)** - Service-to-service authentication
+- **[Schema Sharing](docs/SCHEMA_QUICK_START.md)** - GraphQL schema compilation and sharing
+- **[Schema Details](docs/SCHEMA_SHARING.md)** - Comprehensive schema documentation
+- **[Cleanup Summary](docs/CLEANUP_SUMMARY.md)** - Recent codebase cleanup details
+- **[Archived Docs](docs/archive/)** - Historical documentation and fixes
+
+## Database Connection Optimization
+
+This project uses a singleton Prisma client pattern with connection pooling to prevent "too many clients" errors. The DATABASE_URL includes:
+- `connection_limit=10` - Max connections per instance
+- `pool_timeout=20` - Connection timeout in seconds
+
+See `docs/archive/DATABASE_CONNECTION_FIX.md` for implementation details.
 
 ## License
 
