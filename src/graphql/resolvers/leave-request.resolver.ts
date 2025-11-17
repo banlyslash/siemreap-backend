@@ -113,13 +113,13 @@ export const leaveRequestResolvers = {
       return leaveRequest
     },
 
-    // For managers to see pending requests they need to approve
+    // For managers and HR to see pending requests that need approval
     pendingApprovals: async (_: any, _args: {}, context: GraphQLContext) => {
       const { prisma, user } = context
       requireAuth(user)
       
-      // Only managers can access this query
-      if (user?.role !== 'manager') {
+      // Only managers and HR can access this query
+      if (user?.role !== 'manager' && user?.role !== 'hr') {
         throw new GraphQLError('Not authorized to view pending approvals', {
           extensions: { code: 'FORBIDDEN' }
         })

@@ -1,0 +1,19 @@
+extend type Query {
+  # Dashboard statistics
+  leaveStatistics: LeaveStatistics!
+}
+
+# Leave statistics type
+type LeaveStatistics {
+  pendingApprovals: Int!
+  totalEmployees: Int!
+  onLeaveToday: Int!
+  leaveReports: [LeaveReportStat!]!
+}
+
+# Leave report statistics by type
+type LeaveReportStat {
+  leaveType: LeaveType!
+  count: Int!
+  percentage: Float!
+}

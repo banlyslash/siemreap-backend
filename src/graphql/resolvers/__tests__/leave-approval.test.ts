@@ -1,6 +1,6 @@
 import { leaveRequestResolvers } from '../leave-request.resolver'
-import { GraphQLError } from 'graphql'
 import { LeaveRequestStatus } from '@/generated/client'
+import { GraphQLContext } from '@/graphql/context'
 
 // Mock the notification service
 jest.mock('@/services/notification.service', () => ({
@@ -83,8 +83,10 @@ const createMockContext = (user: any) => ({
       updateMany: jest.fn()
     }
   },
-  user
-})
+  user,
+  req: {} as any,
+  res: {} as any
+}) as unknown as GraphQLContext
 
 describe('Leave Approval Process', () => {
   beforeEach(() => {
@@ -250,6 +252,45 @@ describe('Leave Approval Process', () => {
         }
       })
       expect(result).toEqual([mockLeaveRequest])
+    })
+
+    it('should allow HR to view pending approvals', async () => {
+      const mockContext = createMockContext(mockHR)
+      mockContext.prisma.leaveRequest.findMany.mockResolvedValue([mockLeaveRequest])
+      
+      const result = await leaveRequestResolvers.Query.pendingApprovals(
+        null,
+        {},
+        mockContext
+      )
+      
+      expect(mockContext.prisma.leaveRequest.findMany).toHaveBeenCalledWith({
+        where: {
+          status: LeaveRequestStatus.pending
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: true,
+          leaveType: true,
+          manager: true,
+          hr: true
+        }
+      })
+      expect(result).toEqual([mockLeaveRequest])
+    })
+
+    it('should not allow employees to view pending approvals', async () => {
+      const mockContext = createMockContext(mockEmployee)
+      
+      await expect(
+        leaveRequestResolvers.Query.pendingApprovals(
+          null,
+          {},
+          mockContext
+        )
+      ).rejects.toThrow('Not authorized to view pending approvals')
+      
+      expect(mockContext.prisma.leaveRequest.findMany).not.toHaveBeenCalled()
     })
 
     it('should allow HR to view manager-approved requests', async () => {

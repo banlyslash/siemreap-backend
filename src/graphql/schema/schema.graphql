@@ -47,13 +47,17 @@ type Query {
   leaveAuditTrail(leaveRequestId: ID!): [LeaveAuditEntry!]!
   
   # Leave approval dashboard queries
-  pendingApprovals: [LeaveRequest!]! # For managers to see pending requests they need to approve
+  pendingApprovals: [LeaveRequest!]! # For managers and HR to see pending requests that need approval
   managerApprovedRequests: [LeaveRequest!]! # For HR to see requests approved by managers
 
   # Leave balance queries
   leaveBalances(userId: ID, year: Int): [LeaveBalance!]!
   leaveBalance(id: ID!): LeaveBalance
   userLeaveBalances(userId: ID!, year: Int): UserLeaveBalances!
+
+  # Team queries
+  teamMembers(managerId: ID!): [User!]!
+  teamOnLeaveToday(managerId: ID!): [LeaveRequest!]!
 
   # Holiday queries
   holidays(year: Int): [Holiday!]!
@@ -87,6 +91,7 @@ type Mutation {
   
   # Leave balance mutations
   updateLeaveBalance(id: ID!, input: UpdateLeaveBalanceInput!): LeaveBalance!
+  initializeLeaveBalance(input: InitializeLeaveBalanceInput!): InitializeLeaveBalanceResult!
   
   # Holiday mutations
   createHoliday(input: CreateHolidayInput!): Holiday!

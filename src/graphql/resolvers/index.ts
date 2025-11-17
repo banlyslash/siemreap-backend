@@ -6,6 +6,7 @@ import { userResolvers } from './user.resolver'
 import { leaveTypeResolvers } from './leave-type.resolver'
 import { leaveBalanceResolvers } from './leave-balance.resolver'
 import { holidayResolvers } from './holiday.resolver'
+import { statisticsResolvers } from './statistics.resolver'
 
 // Merge all resolvers
 const resolvers = {
@@ -34,6 +35,7 @@ const resolvers = {
     ...leaveTypeResolvers.Query,
     ...leaveBalanceResolvers.Query,
     ...holidayResolvers.Query,
+    ...statisticsResolvers.Query,
   },
   
   // Mutation resolvers
