@@ -273,68 +273,201 @@ async function main(): Promise<void> {
   await createLeaveBalances(employee4.id, 20, 15, 3)
   await createLeaveBalances(employee5.id, 20, 15, 3)
 
-  // Create holidays for the current year
+  // Create Cambodian public holidays for 2024 and 2025
   await prisma.holiday.createMany({
     data: [
+      // 2024 Holidays
       {
-        name: 'New Year\'s Day',
-        date: new Date(`${currentYear}-01-01`),
-        description: 'New Year\'s Day celebration',
+        name: 'International New Year\'s Day',
+        date: new Date('2024-01-01'),
+        description: 'International New Year celebration',
       },
       {
-        name: 'Martin Luther King Jr. Day',
-        date: new Date(`${currentYear}-01-15`),
-        description: 'Honoring Dr. Martin Luther King Jr.',
+        name: 'Victory over Genocide Day',
+        date: new Date('2024-01-07'),
+        description: 'Commemorating the end of the Khmer Rouge regime',
       },
       {
-        name: 'Valentine\'s Day',
-        date: new Date(`${currentYear}-02-14`),
-        description: 'Day of love and affection',
+        name: 'Khmer New Year',
+        date: new Date('2024-04-13'),
+        description: 'Khmer New Year - Day 1',
       },
       {
-        name: 'Presidents\' Day',
-        date: new Date(`${currentYear}-02-19`),
-        description: 'Honoring U.S. presidents',
+        name: 'Khmer New Year',
+        date: new Date('2024-04-14'),
+        description: 'Khmer New Year - Day 2',
       },
       {
-        name: 'Memorial Day',
-        date: new Date(`${currentYear}-05-29`),
-        description: 'Honoring those who died in military service',
+        name: 'Khmer New Year',
+        date: new Date('2024-04-15'),
+        description: 'Khmer New Year - Day 3',
       },
       {
-        name: 'Labor Day',
-        date: new Date(`${currentYear}-05-01`),
-        description: 'International Workers\' Day',
+        name: 'International Workers\' Day',
+        date: new Date('2024-05-01'),
+        description: 'International Labor Day',
+      },
+      {
+        name: 'King\'s Birthday',
+        date: new Date('2024-05-14'),
+        description: 'Birthday of King Norodom Sihamoni',
+      },
+      {
+        name: 'Royal Ploughing Ceremony',
+        date: new Date('2024-05-22'),
+        description: 'Traditional royal ceremony marking the beginning of the rice-growing season',
+      },
+      {
+        name: 'Queen Mother\'s Birthday',
+        date: new Date('2024-06-18'),
+        description: 'Birthday of Queen Mother Norodom Monineath',
+      },
+      {
+        name: 'Constitution Day',
+        date: new Date('2024-09-24'),
+        description: 'Celebrating the Cambodian Constitution',
+      },
+      {
+        name: 'Pchum Ben Day',
+        date: new Date('2024-10-01'),
+        description: 'Pchum Ben (Ancestors\' Day) - Day 1',
+      },
+      {
+        name: 'Pchum Ben Day',
+        date: new Date('2024-10-02'),
+        description: 'Pchum Ben (Ancestors\' Day) - Day 2',
+      },
+      {
+        name: 'Pchum Ben Day',
+        date: new Date('2024-10-03'),
+        description: 'Pchum Ben (Ancestors\' Day) - Day 3',
+      },
+      {
+        name: 'King Father\'s Commemoration Day',
+        date: new Date('2024-10-15'),
+        description: 'Commemorating King Father Norodom Sihanouk',
+      },
+      {
+        name: 'Paris Peace Agreement Day',
+        date: new Date('2024-10-23'),
+        description: 'Commemorating the Paris Peace Agreements',
       },
       {
         name: 'Independence Day',
-        date: new Date(`${currentYear}-07-04`),
-        description: 'National Independence Day',
+        date: new Date('2024-11-09'),
+        description: 'Cambodian Independence Day from France',
       },
       {
-        name: 'Veterans Day',
-        date: new Date(`${currentYear}-11-11`),
-        description: 'Honoring military veterans',
+        name: 'Water Festival (Bon Om Touk)',
+        date: new Date('2024-11-14'),
+        description: 'Water Festival - Day 1',
       },
       {
-        name: 'Thanksgiving Day',
-        date: new Date(`${currentYear}-11-23`),
-        description: 'Day of giving thanks',
+        name: 'Water Festival (Bon Om Touk)',
+        date: new Date('2024-11-15'),
+        description: 'Water Festival - Day 2',
       },
       {
-        name: 'Christmas Eve',
-        date: new Date(`${currentYear}-12-24`),
-        description: 'Day before Christmas',
+        name: 'Water Festival (Bon Om Touk)',
+        date: new Date('2024-11-16'),
+        description: 'Water Festival - Day 3',
+      },
+      
+      // 2025 Holidays
+      {
+        name: 'International New Year\'s Day',
+        date: new Date('2025-01-01'),
+        description: 'International New Year celebration',
       },
       {
-        name: 'Christmas Day',
-        date: new Date(`${currentYear}-12-25`),
-        description: 'Christmas Day celebration',
+        name: 'Victory over Genocide Day',
+        date: new Date('2025-01-07'),
+        description: 'Commemorating the end of the Khmer Rouge regime',
       },
       {
-        name: 'New Year\'s Eve',
-        date: new Date(`${currentYear}-12-31`),
-        description: 'Last day of the year',
+        name: 'Khmer New Year',
+        date: new Date('2025-04-14'),
+        description: 'Khmer New Year - Day 1',
+      },
+      {
+        name: 'Khmer New Year',
+        date: new Date('2025-04-15'),
+        description: 'Khmer New Year - Day 2',
+      },
+      {
+        name: 'Khmer New Year',
+        date: new Date('2025-04-16'),
+        description: 'Khmer New Year - Day 3',
+      },
+      {
+        name: 'International Workers\' Day',
+        date: new Date('2025-05-01'),
+        description: 'International Labor Day',
+      },
+      {
+        name: 'King\'s Birthday',
+        date: new Date('2025-05-14'),
+        description: 'Birthday of King Norodom Sihamoni',
+      },
+      {
+        name: 'Royal Ploughing Ceremony',
+        date: new Date('2025-05-10'),
+        description: 'Traditional royal ceremony marking the beginning of the rice-growing season',
+      },
+      {
+        name: 'Queen Mother\'s Birthday',
+        date: new Date('2025-06-18'),
+        description: 'Birthday of Queen Mother Norodom Monineath',
+      },
+      {
+        name: 'Constitution Day',
+        date: new Date('2025-09-24'),
+        description: 'Celebrating the Cambodian Constitution',
+      },
+      {
+        name: 'Pchum Ben Day',
+        date: new Date('2025-09-20'),
+        description: 'Pchum Ben (Ancestors\' Day) - Day 1',
+      },
+      {
+        name: 'Pchum Ben Day',
+        date: new Date('2025-09-21'),
+        description: 'Pchum Ben (Ancestors\' Day) - Day 2',
+      },
+      {
+        name: 'Pchum Ben Day',
+        date: new Date('2025-09-22'),
+        description: 'Pchum Ben (Ancestors\' Day) - Day 3',
+      },
+      {
+        name: 'King Father\'s Commemoration Day',
+        date: new Date('2025-10-15'),
+        description: 'Commemorating King Father Norodom Sihanouk',
+      },
+      {
+        name: 'Paris Peace Agreement Day',
+        date: new Date('2025-10-23'),
+        description: 'Commemorating the Paris Peace Agreements',
+      },
+      {
+        name: 'Independence Day',
+        date: new Date('2025-11-09'),
+        description: 'Cambodian Independence Day from France',
+      },
+      {
+        name: 'Water Festival (Bon Om Touk)',
+        date: new Date('2025-11-04'),
+        description: 'Water Festival - Day 1',
+      },
+      {
+        name: 'Water Festival (Bon Om Touk)',
+        date: new Date('2025-11-05'),
+        description: 'Water Festival - Day 2',
+      },
+      {
+        name: 'Water Festival (Bon Om Touk)',
+        date: new Date('2025-11-06'),
+        description: 'Water Festival - Day 3',
       },
     ],
   })
