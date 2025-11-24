@@ -110,17 +110,58 @@ The Leave Request Management System (LRMS) is a modern backend application desig
 
 ## Development
 
-1. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   The server will be available at http://localhost:3001
+### Running the Development Server
 
-2. Available development commands:
-   - `npm run dev` - Start development server with hot reloading
-   - `npm run lint` - Run ESLint to check code quality
-   - `npm run lint:fix` - Fix ESLint issues automatically
-   - `npm run format` - Format code with Prettier
+Start the development server with automatic hot reload:
+
+```bash
+npm run dev
+```
+
+The server will automatically restart when you make changes to:
+- TypeScript files (*.ts)
+- GraphQL schema files (*.graphql)
+- Configuration files (*.json)
+
+The server will be available at http://localhost:4000 (GraphQL endpoint)
+
+### Manual Restart
+
+If you need to manually restart the server during development, type `rs` in the terminal and press Enter.
+
+### Debugging
+
+To run the server with Node.js debugging enabled:
+
+```bash
+npm run dev:debug
+```
+
+Then attach your debugger to the Node.js process (default port: 9229).
+
+### Available Development Commands
+
+- `npm run dev` - Start development server with hot reloading (nodemon)
+- `npm run dev:debug` - Start development server with debugging enabled
+- `npm run dev:legacy` - Start development server without hot reload (fallback)
+- `npm run lint` - Run ESLint to check code quality
+- `npm run lint:fix` - Fix ESLint issues automatically
+- `npm run format` - Format code with Prettier
+
+### Troubleshooting Hot Reload
+
+**Server not restarting on changes:**
+- Check that nodemon is watching the correct directories (configured in `nodemon.json`)
+- Verify file extensions are included in the watch configuration
+- Check for syntax errors in your code
+
+**Too many restarts:**
+- The default delay is set to 1000ms (1 second) to prevent multiple rapid restarts
+- If you're still experiencing issues, you can increase the `delay` value in `nodemon.json`
+
+**Prisma schema changes not detected:**
+- Run `npm run prisma:generate` manually after schema changes
+- The server will restart automatically after generation completes
 
 ## Database Management
 

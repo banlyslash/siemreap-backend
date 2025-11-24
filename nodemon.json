@@ -1,0 +1,12 @@
+{
+  "watch": ["src"],
+  "ext": "ts,graphql,json",
+  "ignore": ["src/**/*.spec.ts", "src/**/*.test.ts", "node_modules"],
+  "exec": "ts-node -r tsconfig-paths/register src/simple-graphql-server.ts",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "delay": 1000,
+  "verbose": true,
+  "restartable": "rs"
+}

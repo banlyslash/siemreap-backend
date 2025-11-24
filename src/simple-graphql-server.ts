@@ -62,8 +62,43 @@ async function startServer() {
   })
 
   console.log(`🚀 Server ready at: ${url}`)
+  
+  return server
 }
 
-startServer().catch(err => {
-  console.error('Error starting server:', err)
+// Start the server
+let apolloServer: ApolloServer<GraphQLContext> | null = null
+
+startServer()
+  .then(server => {
+    apolloServer = server
+  })
+  .catch(err => {
+    console.error('Error starting server:', err)
+    process.exit(1)
+  })
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received, closing server gracefully...')
+  
+  if (apolloServer) {
+    await apolloServer.stop()
+  }
+  
+  await prisma.$disconnect()
+  console.log('Server closed')
+  process.exit(0)
+})
+
+process.on('SIGINT', async () => {
+  console.log('SIGINT received, closing server gracefully...')
+  
+  if (apolloServer) {
+    await apolloServer.stop()
+  }
+  
+  await prisma.$disconnect()
+  console.log('Server closed')
+  process.exit(0)
 })
